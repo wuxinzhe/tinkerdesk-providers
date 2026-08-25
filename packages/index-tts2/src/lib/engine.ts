@@ -1,5 +1,5 @@
 /**
- * lib/index.js — IndexTTS-2.5 引擎封装：spawn Python 进程合成克隆语音
+ * src/lib/engine.ts — IndexTTS-2.5 引擎封装：spawn Python 进程合成克隆语音
  *
  * 环境（本机预装）：
  *   - 项目: C:\tools\index-tts（uv sync 安装依赖——venv: .venv\Scripts\python.exe）
@@ -9,24 +9,25 @@
  *   INDEX_TTS_DIR          项目根（默认 C:\tools\index-tts）
  *   INDEX_TTS_VENV_PYTHON  venv python 路径（默认项目 .venv）
  */
-const { spawn } = require('child_process')
-const { join } = require('path')
-const { existsSync, readFileSync } = require('fs')
+import { spawn } from 'child_process'
+import { join } from 'path'
+import { existsSync, readFileSync } from 'fs'
+import { tmpdir } from 'os'
 
 const PROJECT_DIR = process.env.INDEX_TTS_DIR || 'C:\\tools\\index-tts'
 
 /** 项目 venv python（环境变量优先，回退 Windows 惯例路径） */
-function findPython() {
+function findPython(): string | undefined {
   const candidates = [
     process.env.INDEX_TTS_VENV_PYTHON,
     join(PROJECT_DIR, '.venv', 'Scripts', 'python.exe'),
     join(PROJECT_DIR, '.venv', 'python.exe'),
-  ].filter(Boolean)
+  ].filter((p): p is string => !!p)
   return candidates.find((p) => existsSync(p))
 }
 
 /** 模型是否就绪（config.yaml + gpt.pth 是关键文件） */
-function isModelReady() {
+export function isModelReady(): boolean {
   return (
     existsSync(join(PROJECT_DIR, 'checkpoints', 'config.yaml')) &&
     existsSync(join(PROJECT_DIR, 'checkpoints', 'gpt.pth'))
@@ -34,34 +35,45 @@ function isModelReady() {
 }
 
 /** 环境探测：python + 模型 */
-function detectEnv() {
+export function detectEnv(): { python: string | undefined; projectDir: string; script: string; ok: boolean } {
   const python = findPython()
   return {
     python,
     projectDir: PROJECT_DIR,
-    script: join(__dirname, '..', 'scripts', 'gen_index.py'),
+    script: join(__dirname, '..', '..', 'scripts', 'gen_index.py'),
     ok: !!python && isModelReady(),
   }
 }
 
+/** 合成选项 */
+export interface SynthesizeOptions {
+  text: string
+  refAudio: string
+  lang?: string
+  durationFactor?: number
+  emotionMode?: 'none' | 'audio' | 'vector'
+  emoAudioPrompt?: string
+  emotionPreset?: string
+  emoAlpha?: number
+  textNormalization?: boolean
+  intervalSilence?: number
+  useRandom?: boolean
+  useBf16?: boolean
+}
+
 /**
  * 合成语音：spawn python → wav 文件 → 返回 wav 绝对路径
- * @param {object} opts {
- *   text, refAudio,
- *   lang?, durationFactor?,
- *   emotionMode? ('none'|'audio'|'vector'), emoAudioPrompt?, emotionPreset?,
- *   emoAlpha?, textNormalization?, intervalSilence?, useRandom?, useBf16?
- * }
- * @returns {Promise<{ wavPath: string }>}
+ * @returns {Promise<{ wavPath: string; ms: number }>}
  */
-async function synthesize(opts) {
+export async function synthesize(opts: SynthesizeOptions): Promise<{ wavPath: string; ms: number }> {
   const { text, refAudio } = opts
   const env = detectEnv()
   if (!env.ok) {
     throw new Error('IndexTTS 环境未就绪（需要 C:\\tools\\index-tts 项目 + checkpoints 模型）')
   }
+  if (!env.python) throw new Error('IndexTTS python 未找到')
 
-  const outPath = join(require('os').tmpdir(), `indextts-${Date.now()}-${Math.floor(Math.random() * 10000)}.wav`)
+  const outPath = join(tmpdir(), `indextts-${Date.now()}-${Math.floor(Math.random() * 10000)}.wav`)
   const payload = JSON.stringify({
     text,
     refAudio,
@@ -79,8 +91,8 @@ async function synthesize(opts) {
   })
 
   const started = Date.now()
-  const result = await new Promise((resolve, reject) => {
-    const child = spawn(env.python, [env.script], {
+  const result = await new Promise<{ ok: boolean; outPath?: string; error?: string }>((resolve, reject) => {
+    const child = spawn(env.python!, [env.script], {
       cwd: env.projectDir, // import indextts 需要项目根
       env: {
         ...process.env,
@@ -113,13 +125,12 @@ async function synthesize(opts) {
   if (!result.ok) {
     throw new Error(result.error || '合成失败')
   }
+  if (!result.outPath) throw new Error('合成未返回输出路径')
   return { wavPath: result.outPath, ms: Date.now() - started }
 }
 
 /** wav 文件 → data URL（音频气泡播放） */
-function wavToDataUrl(wavPath) {
+export function wavToDataUrl(wavPath: string): string {
   const buf = readFileSync(wavPath)
   return `data:audio/wav;base64,${buf.toString('base64')}`
 }
-
-module.exports = { synthesize, wavToDataUrl, detectEnv, isModelReady }
