@@ -1,9 +1,9 @@
 {
   "id": "speech-omni-voice",
   "name": "语音克隆（OmniVoice）",
-  "version": "0.1.3",
+  "version": "0.2.0",
   "apiVersion": 1,
-  "entry": "index.js",
+  "entry": "dist/index.js",
   "requiresMain": true,
   "capabilities": [
     "tts",

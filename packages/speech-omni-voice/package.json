@@ -1,19 +1,19 @@
 {
   "name": "tinkerdesk-provider-speech-omni-voice",
-  "version": "0.1.3",
+  "version": "0.2.0",
   "description": "TinkerDesk 插件：OmniVoice 声音克隆 TTS（仿声朗读）",
-  "main": "index.js",
+  "main": "dist/index.js",
   "files": [
-    "index.js",
+    "dist/",
     "manifest.json",
-    "core/",
+    "plugin-types.d.ts",
     "scripts/",
     "guide.md",
-    "README.md",
-    "lib/"
+    "README.md"
   ],
   "scripts": {
-    "verify": "node scripts/verify.js"
+    "verify": "node scripts/verify.js",
+    "build": "tsc -p tsconfig.json"
   },
   "keywords": [
     "tinkerdesk-provider",
@@ -22,5 +22,8 @@
   ],
   "publishConfig": {
     "access": "public"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.0"
   }
 }
