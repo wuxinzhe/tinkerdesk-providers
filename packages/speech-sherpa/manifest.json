@@ -1,9 +1,9 @@
 {
   "id": "speech-sherpa",
   "name": "本地语音（Sherpa-ONNX）",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "apiVersion": 1,
-  "entry": "index.js",
+  "entry": "dist/index.js",
   "requiresMain": true,
   "capabilities": [
     "stt",
