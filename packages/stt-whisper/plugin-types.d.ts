@@ -59,6 +59,14 @@ export interface PluginContext {
   setConfig: (patch: Record<string, unknown>) => void
 }
 
+/** 插件状态（getStatus 返回——loaded/enabled 由应用托管，detail 扩展自定义） */
+export interface PluginStatus {
+  loaded?: boolean
+  enabled?: boolean
+  started?: boolean
+  detail?: string
+}
+
 /** 自检项 */
 export interface PluginCheckItem {
   name: string
@@ -72,7 +80,34 @@ export interface PluginCheckResult {
   checks: PluginCheckItem[]
 }
 
-/** 插件 API（init 返回值） */
+/**
+ * TinkerProvider v2 — Provider 统一契约（OO 形态）
+ *
+ * 一个类 = 一个扩展的完整生命体。入口导出类本身（loader 负责 new + init）。
+ * 静态/动态分离：manifest.json（含 configSchema）先于代码加载——
+ * 插件代码损坏不影响静态信息展示。
+ */
+export interface TinkerProvider {
+  /** 声明式配置 schema（外置扩展以 manifest.json 为准——此字段仅作补充） */
+  readonly configSchema?: ConfigSchema
+
+  /** 构造性初始化：注册 IPC 能力频道、读取初始配置（每实例仅一次） */
+  init(ctx: PluginContext): void | Promise<void>
+
+  /** 自检（启用前必须通过；失败时 checks 给出修复引导） */
+  check(): PluginCheckResult
+
+  /** 启动（check 通过后调用） */
+  start(): void | Promise<void>
+
+  /** 停止（保持已加载状态，释放活动资源） */
+  stop(): void | Promise<void>
+
+  /** 彻底释放（卸载/热重载前） */
+  dispose(): void | Promise<void>
+}
+
+/** @deprecated v1 旧形态（init 返回值）——升级到 TinkerProvider 类形态 */
 export interface PluginApi {
   check(): PluginCheckResult
   start?(): void | Promise<void>
