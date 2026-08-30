@@ -1,7 +1,7 @@
 {
   "id": "speech-index-tts",
-  "name": "\u8bed\u97f3\u514b\u9686\uff08IndexTTS-2.5\uff09",
-  "version": "0.2.4",
+  "name": "语音克隆（IndexTTS-2.5）",
+  "version": "0.2.5",
   "apiVersion": 1,
   "entry": "dist/index.js",
   "requiresMain": true,
@@ -24,30 +24,21 @@
   ],
   "installDoc": {
     "present": true,
-    "title": "\u5b89\u88c5 IndexTTS \u8fd0\u884c\u65f6\uff08Python \u5e94\u7528 + \u6a21\u578b\uff09",
+    "title": "安装 IndexTTS 运行时（Python 应用 + 模型）",
     "runtimeId": "speech-index-tts"
   },
-  "description": "\u7528\u53c2\u8003\u97f3\u9891\u514b\u9686\u97f3\u8272\u6717\u8bfb\uff08IndexTTS-2.5 \u96f6\u6837\u672c\u514b\u9686\u2014\u2014\u4e2d/\u82f1/\u65e5/\u897f/\u963f\u4e94\u8bed\uff0c\u9700\u8981\u672c\u673a GPU\uff09",
-  "assetDeps": [
-    {
-      "name": "IndexTTS-2.5 \u6a21\u578b\uff08\u58f0\u97f3\u514b\u9686\uff09",
-      "dest": "checkpoints",
-      "sizeMB": 5120,
-      "url": "https://modelscope.cn/models/IndexTeam/IndexTTS-2.5",
-      "optional": true
-    }
-  ],
+  "description": "用参考音频克隆音色朗读（IndexTTS-2.5 零样本克隆——中/英/日/西/阿五语，需要本机 GPU）",
   "configSchema": {
     "type": "object",
     "properties": {
       "voiceProfile": {
         "type": "file",
-        "title": "\u53c2\u8003\u97f3\u8272\uff08\u4eff\u58f0\uff09",
-        "placeholder": "\u8bf7\u9009\u62e9\u4e00\u4e2a\u97f3\u9891\u6587\u4ef6\uff08*.wav \u6216 *.mp3\uff09",
+        "title": "参考音色（仿声）",
+        "placeholder": "请选择一个音频文件（*.wav 或 *.mp3）",
         "default": "",
         "filters": [
           {
-            "name": "\u97f3\u9891\u6587\u4ef6",
+            "name": "音频文件",
             "extensions": [
               "wav",
               "mp3",
@@ -56,14 +47,14 @@
             ]
           }
         ],
-        "description": "\u7528\u8fd9\u6bb5\u53c2\u8003\u97f3\u9891\u7684\u58f0\u97f3\u6717\u8bfb\uff08\u5efa\u8bae 5-10 \u79d2\u6e05\u6670\u4eba\u58f0\u2014\u2014IndexTTS \u96f6\u6837\u672c\u514b\u9686\uff0c\u65e0\u9700\u586b\u5199\u8f6c\u5199\u6587\u672c\uff09"
+        "description": "用这段参考音频的声音朗读（建议 5-10 秒清晰人声——IndexTTS 零样本克隆，无需填写转写文本）"
       },
       "lang": {
         "type": "select",
-        "title": "\u5408\u6210\u8bed\u8a00",
+        "title": "合成语言",
         "options": [
           {
-            "label": "\u4e2d\u6587",
+            "label": "中文",
             "value": "ZH"
           },
           {
@@ -71,58 +62,58 @@
             "value": "EN"
           },
           {
-            "label": "\u65e5\u672c\u8a9e",
+            "label": "日本語",
             "value": "JA"
           },
           {
-            "label": "Espa\u00f1ol",
+            "label": "Español",
             "value": "ES"
           },
           {
-            "label": "\u0627\u0644\u0639\u0631\u0628\u064a\u0629",
+            "label": "العربية",
             "value": "AR"
           }
         ],
         "default": "ZH",
-        "description": "IndexTTS-2.5 \u652f\u6301\u4e2d/\u82f1/\u65e5/\u897f/\u963f\u4e94\u8bed\u2014\u2014\u4e0e\u53c2\u8003\u97f3\u8272\u8bed\u8a00\u65e0\u5173\uff08\u8de8\u8bed\u8a00\u514b\u9686\uff09"
+        "description": "IndexTTS-2.5 支持中/英/日/西/阿五语——与参考音色语言无关（跨语言克隆）"
       },
       "speed": {
         "type": "number",
-        "title": "\u8bed\u901f",
+        "title": "语速",
         "min": 0.5,
         "max": 2,
         "step": 0.1,
         "default": 1,
-        "description": ">1.0 \u66f4\u5feb\uff0c<1.0 \u66f4\u6162\uff08\u5185\u90e8\u6620\u5c04 IndexTTS duration_factor\uff09"
+        "description": ">1.0 更快，<1.0 更慢（内部映射 IndexTTS duration_factor）"
       },
       "emotionMode": {
         "type": "select",
-        "title": "\u60c5\u611f\u63a7\u5236",
+        "title": "情感控制",
         "options": [
           {
-            "label": "\u4e0e\u97f3\u8272\u53c2\u8003\u97f3\u9891\u76f8\u540c\uff08\u65e0\u60c5\u611f\u63a7\u5236\uff09",
+            "label": "与音色参考音频相同（无情感控制）",
             "value": "none"
           },
           {
-            "label": "\u4f7f\u7528\u60c5\u611f\u53c2\u8003\u97f3\u9891",
+            "label": "使用情感参考音频",
             "value": "audio"
           },
           {
-            "label": "\u4f7f\u7528\u60c5\u611f\u9884\u8bbe\uff08\u5411\u91cf\uff09",
+            "label": "使用情感预设（向量）",
             "value": "vector"
           }
         ],
         "default": "none",
-        "description": "IndexTTS-2.5 \u652f\u6301\u4e09\u79cd\u60c5\u611f\u63a7\u5236\u65b9\u5f0f\u2014\u2014\u53c2\u8003\u97f3\u9891\uff08\u97f3\u8272\u9644\u5e26\u7684\u60c5\u611f\uff09/ \u5355\u72ec\u60c5\u611f\u97f3\u9891 / \u60c5\u611f\u5411\u91cf\u9884\u8bbe"
+        "description": "IndexTTS-2.5 支持三种情感控制方式——参考音频（音色附带的情感）/ 单独情感音频 / 情感向量预设"
       },
       "emoAudioPrompt": {
         "type": "file",
-        "title": "\u60c5\u611f\u53c2\u8003\u97f3\u9891",
-        "placeholder": "\u9009\u62e9\u5e26\u76ee\u6807\u60c5\u611f\u7684\u97f3\u9891\uff08emotionMode=\u4f7f\u7528\u60c5\u611f\u53c2\u8003\u97f3\u9891\u65f6\u751f\u6548\uff09",
+        "title": "情感参考音频",
+        "placeholder": "选择带目标情感的音频（emotionMode=使用情感参考音频时生效）",
         "default": "",
         "filters": [
           {
-            "name": "\u97f3\u9891\u6587\u4ef6",
+            "name": "音频文件",
             "extensions": [
               "wav",
               "mp3",
@@ -131,83 +122,83 @@
             ]
           }
         ],
-        "description": "\u8fd9\u6bb5\u97f3\u9891\u7684\u60c5\u611f\u4f1a\u8fc1\u79fb\u5230\u5408\u6210\u8bed\u97f3\u4e0a\uff08\u5982\u54ed\u6ce3/\u5174\u594b\u7684\u8bf4\u8bdd\u7247\u6bb5\uff09"
+        "description": "这段音频的情感会迁移到合成语音上（如哭泣/兴奋的说话片段）"
       },
       "emotionPreset": {
         "type": "select",
-        "title": "\u60c5\u611f\u9884\u8bbe",
+        "title": "情感预设",
         "options": [
           {
-            "label": "\u5f00\u5fc3",
+            "label": "开心",
             "value": "happy"
           },
           {
-            "label": "\u751f\u6c14",
+            "label": "生气",
             "value": "angry"
           },
           {
-            "label": "\u60b2\u4f24",
+            "label": "悲伤",
             "value": "sad"
           },
           {
-            "label": "\u5bb3\u6015",
+            "label": "害怕",
             "value": "afraid"
           },
           {
-            "label": "\u538c\u6076",
+            "label": "厌恶",
             "value": "disgusted"
           },
           {
-            "label": "\u5fe7\u90c1",
+            "label": "忧郁",
             "value": "melancholic"
           },
           {
-            "label": "\u60ca\u8bb6",
+            "label": "惊讶",
             "value": "surprised"
           },
           {
-            "label": "\u5e73\u9759",
+            "label": "平静",
             "value": "calm"
           }
         ],
         "default": "happy",
-        "description": "\u60c5\u611f\u5411\u91cf\u9884\u8bbe\uff08emotionMode=\u4f7f\u7528\u60c5\u611f\u9884\u8bbe\u65f6\u751f\u6548\uff09\u2014\u2014[happy, angry, sad, afraid, disgusted, melancholic, surprised, calm]"
+        "description": "情感向量预设（emotionMode=使用情感预设时生效）——[happy, angry, sad, afraid, disgusted, melancholic, surprised, calm]"
       },
       "emoAlpha": {
         "type": "number",
-        "title": "\u60c5\u611f\u5f3a\u5ea6",
+        "title": "情感强度",
         "min": 0,
         "max": 1,
         "step": 0.1,
         "default": 1,
-        "description": "\u60c5\u611f\u5f71\u54cd\u5f3a\u5ea6\uff080.0-1.0\u2014\u20141.0 \u4e3a 100%\uff09"
+        "description": "情感影响强度（0.0-1.0——1.0 为 100%）"
       },
       "textNormalization": {
         "type": "boolean",
-        "title": "\u6587\u672c\u5f52\u4e00\u5316",
+        "title": "文本归一化",
         "default": true,
-        "description": "\u628a\u6570\u5b57/\u65e5\u671f/\u7f29\u5199\u8f6c\u4e3a\u53e3\u8bed\uff082026\u5e74 \u2192 \u4e8c\u96f6\u4e8c\u516d\u5e74\uff09"
+        "description": "把数字/日期/缩写转为口语（2026年 → 二零二六年）"
       },
       "intervalSilence": {
         "type": "number",
-        "title": "\u5206\u6bb5\u95f4\u9694\u9759\u97f3\uff08ms\uff09",
+        "title": "分段间隔静音（ms）",
         "min": 50,
         "max": 1000,
         "step": 50,
         "default": 200,
-        "description": "\u957f\u6587\u672c\u81ea\u52a8\u5206\u6bb5\u65f6\u6bb5\u95f4\u63d2\u5165\u7684\u9759\u97f3\u65f6\u957f"
+        "description": "长文本自动分段时段间插入的静音时长"
       },
       "useRandom": {
         "type": "boolean",
-        "title": "\u968f\u673a\u91c7\u6837",
+        "title": "随机采样",
         "default": false,
-        "description": "\u63a8\u7406\u968f\u673a\u6027\u2014\u2014\u589e\u5f3a\u8868\u73b0\u529b\u4f46\u964d\u4f4e\u514b\u9686\u4fdd\u771f\u5ea6\uff08\u53ef\u9009\u5f00\u5173\uff09"
+        "description": "推理随机性——增强表现力但降低克隆保真度（可选开关）"
       },
       "bf16": {
         "type": "boolean",
-        "title": "BF16 \u63a8\u7406\uff08\u7701\u663e\u5b58\uff09",
+        "title": "BF16 推理（省显存）",
         "default": true,
-        "description": "\u534a\u7cbe\u5ea6\u63a8\u7406\u2014\u2014\u663e\u5b58\u5360\u7528\u66f4\u4f4e\u3001\u901f\u5ea6\u66f4\u5feb\u3001\u8d28\u91cf\u635f\u5931\u6781\u5c0f\uff0816GB \u663e\u5361\u5efa\u8bae\u5f00\u542f\uff09"
+        "description": "半精度推理——显存占用更低、速度更快、质量损失极小（16GB 显卡建议开启）"
       }
     }
   }
