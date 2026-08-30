@@ -21,7 +21,7 @@
  */
 import { existsSync, copyFileSync } from 'fs'
 import type { PluginCheckResult, PluginContext, TinkerProvider } from '../plugin-types'
-import { synthesize, wavToDataUrl, detectEnv, isModelReady } from './lib/engine'
+import { synthesize, wavToDataUrl, detectEnv, isModelReady, initEngine } from './lib/engine'
 
 /** 语速 → IndexTTS duration_factor（speed>1 快 → factor<1 时长短；clamp 0.5-2.0） */
 function speedToFactor(speed: unknown): number {
@@ -75,6 +75,7 @@ export default class IndexTts2Provider implements TinkerProvider {
 
   init(ctx: PluginContext): void {
     this.ctx = ctx
+    initEngine(ctx.configDir)
 
     // ── TTS：用配置的仿声音色合成 ──
     ctx.registerIpc('tts:speak', async (payload) => {
@@ -111,7 +112,7 @@ export default class IndexTts2Provider implements TinkerProvider {
     ctx.registerIpc('models:download', async () => {
       if (isModelReady()) return { ok: true, skipped: true }
       throw new Error(
-        'IndexTTS 模型未就绪——请手动下载：cd C:\\tools\\index-tts && modelscope download --model IndexTeam/IndexTTS-2.5 --local_dir checkpoints'
+        'IndexTTS 模型未就绪——请通过「系统依赖」步的 AI 安装助手引导下载（runtime/speech-index-tts/checkpoints）'
       )
     })
   }
@@ -125,8 +126,8 @@ export default class IndexTts2Provider implements TinkerProvider {
           name: 'IndexTTS 环境',
           ok: false,
           hint: env.python
-            ? '模型未就绪（需要 C:\\tools\\index-tts\\checkpoints）'
-            : 'IndexTTS 环境未安装（需要 C:\\tools\\index-tts 项目 + uv sync）',
+            ? '模型未就绪（需要 runtime/speech-index-tts/checkpoints）'
+            : 'IndexTTS 环境未安装（需要 runtime/speech-index-tts 项目 + uv sync——见系统依赖步 AI 安装助手）',
         }],
       }
     }

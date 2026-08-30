@@ -22,6 +22,11 @@
   "permissions": [
     "audio-output"
   ],
+  "installDoc": {
+    "present": true,
+    "title": "安装 IndexTTS 运行时（Python 应用 + 模型）",
+    "runtimeId": "speech-index-tts"
+  },
   "description": "用参考音频克隆音色朗读（IndexTTS-2.5 零样本克隆——中/英/日/西/阿五语，需要本机 GPU）",
   "assetDeps": [
     {
