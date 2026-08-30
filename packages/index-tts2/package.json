@@ -1,6 +1,6 @@
 {
   "name": "tinkerdesk-provider-speech-index-tts",
-  "version": "0.2.8",
+  "version": "0.2.9",
   "description": "TinkerDesk 插件：IndexTTS-2.5 声音克隆 TTS（仿声朗读——中/英/日/西/阿）",
   "main": "dist/index.js",
   "files": [
