@@ -1,0 +1,26 @@
+name: Validate
+
+# PR / main push: 跑 npm run verify 兜底 type+lint+build
+# PR 拦截错误避免合并到 main;push 兜底 publish 前再校一次
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install deps
+        run: npm ci
+
+      - name: Verify (lint + typecheck + build)
+        run: npm run verify
