@@ -1,12 +1,13 @@
 {
   "name": "tinkerdesk-provider-speech-sherpa",
   "version": "0.2.0",
-  "description": "TinkerDesk 插件：本地离线语音 STT + TTS（Sherpa-ONNX）",
+  "description": "TinkerDesk \u63d2\u4ef6\uff1a\u672c\u5730\u79bb\u7ebf\u8bed\u97f3 STT + TTS\uff08Sherpa-ONNX\uff09",
   "main": "dist/index.js",
   "scripts": {
     "pack": "node scripts/pack.js",
     "verify": "node scripts/verify.js",
-    "build": "tsc -p tsconfig.json"
+    "build": "npm run typecheck && tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
     "node-cpal": "0.1.1",

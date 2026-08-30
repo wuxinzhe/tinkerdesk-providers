@@ -13,12 +13,12 @@
  */
 import { PluginCheckResult, PluginContext, PluginStatus, TinkerProvider } from '../plugin-types'
 // core/ 是平台无关 CJS 核心——require 兼容（含 native deps sherpa-onnx）
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+ 
 const { createSpeechService } = require('../core') as { createSpeechService: (deps: unknown) => any }
 
 export default class SpeechSherpaProvider implements TinkerProvider {
   private ctx!: PluginContext
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   private speech: any
 
   init(ctx: PluginContext): void {

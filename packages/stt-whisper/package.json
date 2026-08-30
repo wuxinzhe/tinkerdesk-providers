@@ -1,7 +1,7 @@
 {
   "name": "tinkerdesk-provider-stt-whisper",
   "version": "0.2.1",
-  "description": "语音识别（STT）——whisper.cpp 本地引擎（离线/多语言）",
+  "description": "\u8bed\u97f3\u8bc6\u522b\uff08STT\uff09\u2014\u2014whisper.cpp \u672c\u5730\u5f15\u64ce\uff08\u79bb\u7ebf/\u591a\u8bed\u8a00\uff09",
   "main": "dist/index.js",
   "files": [
     "dist/",
@@ -16,9 +16,10 @@
     "voice"
   ],
   "scripts": {
-    "build": "tsc -p tsconfig.json",
+    "build": "npm run typecheck && tsc -p tsconfig.json",
     "verify": "npm run build && node scripts/verify.js",
-    "pack": "node scripts/pack.js"
+    "pack": "node scripts/pack.js",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "devDependencies": {
     "typescript": "^5.5.0"

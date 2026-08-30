@@ -1,7 +1,7 @@
 {
   "name": "tinkerdesk-providers",
   "version": "1.0.0",
-  "description": "TinkerDesk plugins monorepo —— 单仓库收录所有插件包。每个插件是独立 npm 包，通过 CI 自动发布。",
+  "description": "TinkerDesk plugins monorepo \u2014\u2014 \u5355\u4ed3\u5e93\u6536\u5f55\u6240\u6709\u63d2\u4ef6\u5305\u3002\u6bcf\u4e2a\u63d2\u4ef6\u662f\u72ec\u7acb npm \u5305\uff0c\u901a\u8fc7 CI \u81ea\u52a8\u53d1\u5e03\u3002",
   "private": true,
   "workspaces": [
     "packages/*"
@@ -9,6 +9,19 @@
   "license": "MIT",
   "author": "Hermes Agent",
   "scripts": {
-    "list": "ls packages"
-  }
+    "lint": "node scripts/lint.js",
+    "lint:fix": "eslint packages/*/src --fix",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "check": "npm run lint && npm run typecheck",
+    "build": "npm run lint && npm run typecheck && npm run build --workspaces --if-present",
+    "list": "ls packages",
+    "verify": "npm run check && npm run build --workspaces --if-present"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.5",
+    "eslint": "^9.39.5",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.68.0"
+  },
+  "type": "module"
 }
