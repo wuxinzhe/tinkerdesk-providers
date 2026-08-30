@@ -24,7 +24,7 @@
     "audio-output"
   ],
   "description": "本地离线语音：STT 语音输入（VAD + Zipformer 流式识别）+ TTS 朗读（VITS 中文音色）",
-  "modelDeps": [
+  "assetDeps": [
     {
       "name": "STT 模型（Zipformer 中文 int8）",
       "dest": "models/stt",
