@@ -1,6 +1,6 @@
 {
   "name": "tinkerdesk-provider-stt-whisper",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "语音识别（STT）——whisper.cpp 本地引擎（离线/多语言）",
   "main": "dist/index.js",
   "files": [
