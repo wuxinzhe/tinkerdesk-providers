@@ -4,10 +4,11 @@
   "description": "TinkerDesk \u63d2\u4ef6\uff1a\u672c\u5730\u79bb\u7ebf\u8bed\u97f3 STT + TTS\uff08Sherpa-ONNX\uff09",
   "main": "dist/index.js",
   "scripts": {
-    "pack": "node scripts/pack.js",
-    "verify": "node scripts/verify.js",
     "build": "npm run typecheck && tsc -p tsconfig.json",
-    "typecheck": "tsc -p tsconfig.json --noEmit"
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "pack": "tsx scripts/pack.ts",
+    "verify": "npm run build && tsx scripts/verify.ts",
+    "test-stt": "tsx scripts/test-stt.ts"
   },
   "dependencies": {
     "node-cpal": "0.1.1",

@@ -12,9 +12,7 @@
  * 事件：models:progress {kind, phase, percent}
  */
 import { PluginCheckResult, PluginContext, PluginStatus, TinkerProvider } from '../plugin-types'
-// core/ 是平台无关 CJS 核心——require 兼容（含 native deps sherpa-onnx）
- 
-const { createSpeechService } = require('../core') as { createSpeechService: (deps: unknown) => any }
+import { createSpeechService } from './core'
 
 export default class SpeechSherpaProvider implements TinkerProvider {
   private ctx!: PluginContext

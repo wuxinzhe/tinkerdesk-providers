@@ -1,29 +1,26 @@
 /**
- * core/stt.js — 语音识别（STT）：纯识别能力（平台无关，不负责录音）
+ * src/core/stt.ts — 语音识别（STT）：纯识别能力（平台无关，不负责录音）
  *
  * 输入三种形态：
  *   - samples: Float32Array（16kHz 单声道 PCM，TinkerDesk 应用录音后传入）
  *   - audioPath: wav 文件路径（DeepSeek Harness 模型侧传文件）
  *   - audioBase64: data URL（DeepSeek Harness 模型侧传内嵌音频）
  * 输出：识别文本
- *
- * 模型：streaming-zipformer-zh（流式 transducer，OnlineRecognizer）
- * 一次性喂入整段音频 + 尾部静音 → 循环 decode → 取结果。
  */
-const { join } = require('path')
-const { decodeWavFile, decodeWavBase64 } = require('./wav')
+import { join } from 'path'
+import { decodeWavFile, decodeWavBase64 } from './wav'
 
-// 延迟加载 native 引擎（模型就绪才 require——Worker 启动不碰 native——
-// 模型未下载时插件仍可加载：check 报告未就绪、配置 schema 正常渲染）
-let sherpa_onnx = null
-function getSherpa() {
-  if (!sherpa_onnx) {
-    sherpa_onnx = require('sherpa-onnx-node')
+// 延迟加载 native 引擎（模型就绪才 require——Worker 启动不碰 native）
+let sherpaOnnx: any = null
+function getSherpa(): any {
+  if (!sherpaOnnx) {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    sherpaOnnx = require('sherpa-onnx-node')
   }
-  return sherpa_onnx
+  return sherpaOnnx
 }
 
-function createRecognizer(modelDir) {
+function createRecognizer(modelDir: string): any {
   const config = {
     featConfig: { sampleRate: 16000, featureDim: 80 },
     modelConfig: {
@@ -41,12 +38,14 @@ function createRecognizer(modelDir) {
   return new (getSherpa().OnlineRecognizer)(config)
 }
 
-/**
- * 一次性整段转写（按住说话 → 松开 → 应用把音频送来）
- * @param {object} opts { modelDir, samples: Float32Array }
- * @returns {string} 识别文本
- */
-function transcribe({ modelDir, samples }) {
+/** STT 转写入参 */
+export interface TranscribeOptions {
+  modelDir: string
+  samples: Float32Array
+}
+
+/** 一次性整段转写（按住说话 → 松开 → 应用把音频送来） */
+export function transcribe({ modelDir, samples }: TranscribeOptions): string {
   if (!samples || samples.length === 0) return ''
   const recognizer = createRecognizer(modelDir)
   const stream = recognizer.createStream()
@@ -61,13 +60,11 @@ function transcribe({ modelDir, samples }) {
 }
 
 /** 从 wav 文件转写 */
-function transcribeFile({ modelDir, audioPath }) {
+export function transcribeFile({ modelDir, audioPath }: { modelDir: string; audioPath: string }): string {
   return transcribe({ modelDir, samples: decodeWavFile(audioPath) })
 }
 
 /** 从 data URL 转写 */
-function transcribeBase64({ modelDir, audioBase64 }) {
+export function transcribeBase64({ modelDir, audioBase64 }: { modelDir: string; audioBase64: string }): string {
   return transcribe({ modelDir, samples: decodeWavBase64(audioBase64) })
 }
-
-module.exports = { transcribe, transcribeFile, transcribeBase64 }

@@ -1,25 +1,25 @@
 /**
- * core/tts.js — 语音合成（TTS）：VITS 中文 → wav（平台无关）
+ * src/core/tts.ts — 语音合成（TTS）：VITS 中文 → wav（平台无关）
  *
  * 输出两种形态：
  *   - data URL / base64：TinkerDesk renderer Audio 直接播放
  *   - wav 文件：DeepSeek Harness 模型侧需要落盘路径继续处理
  */
-const { join } = require('path')
+import { join, dirname } from 'path'
+import { mkdirSync } from 'fs'
+import { wavToBase64, encodeWavFile } from './wav'
 
-// 延迟加载 native 引擎（模型就绪才 require——Worker 启动不碰 native——
-// 模型未下载时插件仍可加载：check 报告未就绪、配置 schema 正常渲染）
-let sherpa_onnx = null
-function getSherpa() {
-  if (!sherpa_onnx) {
-    sherpa_onnx = require('sherpa-onnx-node')
+// 延迟加载 native 引擎（模型就绪才 require）
+let sherpaOnnx: any = null
+function getSherpa(): any {
+  if (!sherpaOnnx) {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    sherpaOnnx = require('sherpa-onnx-node')
   }
-  return sherpa_onnx
+  return sherpaOnnx
 }
-const { mkdirSync } = require('fs')
-const { wavToBase64, encodeWavFile } = require('./wav')
 
-function createTts(modelDir) {
+function createTts(modelDir: string): any {
   const config = {
     model: {
       vits: {
@@ -40,31 +40,43 @@ function createTts(modelDir) {
     ].join(','),
     ruleFars: join(modelDir, 'rule.far'),
   }
-  // sherpa-onnx-node 1.13.x：OfflineTts 是 ES class，构造器直接创建 handle。
-  // 不要用 OfflineTts.createSync（该静态方法在此版本不存在）。
+  // sherpa-onnx-node 1.13.x：OfflineTts 是 ES class，构造器直接创建 handle
   return new (getSherpa().OfflineTts)(config)
 }
 
-/**
- * 合成语音 → wav base64 data URL
- * @param {object} opts { modelDir, text, speed?, sid? }
- */
-async function synthesize({ modelDir, text, speed = 1.0, sid = 88 }) {
+/** TTS 合成入参 */
+export interface SynthesizeOptions {
+  modelDir: string
+  text: string
+  speed?: number
+  sid?: number
+}
+
+/** 合成语音 → wav base64 data URL */
+export async function synthesize({ modelDir, text, speed = 1.0, sid = 88 }: SynthesizeOptions): Promise<string> {
   const tts = createTts(modelDir)
   const generationConfig = new (getSherpa().GenerationConfig)({ sid, speed, silenceScale: 0.2 })
   const audio = await tts.generateAsync({ text, generationConfig })
   return wavToBase64(audio.samples, audio.sampleRate)
 }
 
-/**
- * 合成语音 → 落盘 wav 文件（返回 { path, dataUrl, sampleRate, samples }）
- * @param {object} opts { modelDir, text, speed?, sid?, outPath }
- */
-async function synthesizeToFile({ modelDir, text, speed = 1.0, sid = 88, outPath }) {
+/** 合成语音 → 落盘 wav 文件（返回 { path, dataUrl, sampleRate, samples }） */
+export async function synthesizeToFile({
+  modelDir,
+  text,
+  speed = 1.0,
+  sid = 88,
+  outPath,
+}: SynthesizeOptions & { outPath: string }): Promise<{
+  path: string
+  dataUrl: string
+  sampleRate: number
+  samples: number
+}> {
   const tts = createTts(modelDir)
   const generationConfig = new (getSherpa().GenerationConfig)({ sid, speed, silenceScale: 0.2 })
   const audio = await tts.generateAsync({ text, generationConfig })
-  mkdirSync(require('path').dirname(outPath), { recursive: true })
+  mkdirSync(dirname(outPath), { recursive: true })
   encodeWavFile(audio.samples, audio.sampleRate, outPath)
   return {
     path: outPath,
@@ -73,5 +85,3 @@ async function synthesizeToFile({ modelDir, text, speed = 1.0, sid = 88, outPath
     samples: audio.samples.length,
   }
 }
-
-module.exports = { synthesize, synthesizeToFile }
