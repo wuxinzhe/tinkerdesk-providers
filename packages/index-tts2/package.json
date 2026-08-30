@@ -1,6 +1,6 @@
 {
   "name": "tinkerdesk-provider-speech-index-tts",
-  "version": "0.2.0",
+  "version": "0.2.4",
   "description": "TinkerDesk \u63d2\u4ef6\uff1aIndexTTS-2.5 \u58f0\u97f3\u514b\u9686 TTS\uff08\u4eff\u58f0\u6717\u8bfb\u2014\u2014\u4e2d/\u82f1/\u65e5/\u897f/\u963f\uff09",
   "main": "dist/index.js",
   "files": [
@@ -9,7 +9,8 @@
     "plugin-types.d.ts",
     "scripts/",
     "guide.md",
-    "README.md"
+    "README.md",
+    "install.md"
   ],
   "scripts": {
     "verify": "node scripts/verify.js",
